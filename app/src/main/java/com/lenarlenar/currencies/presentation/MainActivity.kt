@@ -1,7 +1,8 @@
-package com.lenarlenar.currencies
+package com.lenarlenar.currencies.presentation
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import com.lenarlenar.currencies.R
 
 class MainActivity : AppCompatActivity() {
 
