@@ -3,6 +3,7 @@ package com.lenarlenar.currencies.presentation
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import com.lenarlenar.currencies.BuildConfig
 import com.lenarlenar.currencies.domain.CurrenciesRepository
 import com.lenarlenar.currencies.domain.models.Currency
 import io.reactivex.Observable
@@ -16,11 +17,11 @@ class CurrenciesViewModel @Inject constructor(private val currenciesRepository: 
 
     val currentBaseCurrency = BehaviorSubject.create<Currency>()
 
-    private val timerObservable = Observable.interval(0, 1, TimeUnit.SECONDS)
+    private val timerObservable = Observable.interval(0, BuildConfig.UPDATE_INTERVAL_SECONDS_AMOUNT, TimeUnit.SECONDS)
 
     private var currenciesStateModelDisposable: Disposable? = null
 
-    private var defaultBaseCurrency = Currency("EUR", 100.0)
+    private var defaultBaseCurrency = Currency(BuildConfig.DEFAULT_BASE_CURRENCY_CODE, BuildConfig.DEFAULT_BASE_CURRENCY_AMOUNT)
 
     private val _currenciesStateModel = MutableLiveData<CurrenciesStateModel>()
     val currenciesStateModel: LiveData<CurrenciesStateModel> = _currenciesStateModel

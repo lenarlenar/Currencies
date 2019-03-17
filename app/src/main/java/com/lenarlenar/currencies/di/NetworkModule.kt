@@ -2,6 +2,7 @@ package com.lenarlenar.currencies.di
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.lenarlenar.currencies.BuildConfig
 import com.lenarlenar.currencies.data.CurrenciesApiService
 import com.lenarlenar.currencies.domain.models.RatesResponseDeserializer
 import com.lenarlenar.currencies.domain.models.RatesResponse
@@ -29,7 +30,7 @@ object NetworkModule{
     @Provides
     fun provideCurrenciesApiService(gson: Gson): CurrenciesApiService {
         return Retrofit.Builder()
-            .baseUrl("https://revolut.duckdns.org/")
+            .baseUrl(BuildConfig.CURRENCY_RATES_BASE_URL)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build()

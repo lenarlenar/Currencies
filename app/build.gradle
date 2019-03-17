@@ -15,6 +15,11 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        buildConfigField 'String', 'CURRENCY_RATES_BASE_URL', '"https://revolut.duckdns.org/"'
+        buildConfigField 'long', 'UPDATE_INTERVAL_SECONDS_AMOUNT', '1'
+        buildConfigField 'String', 'DEFAULT_BASE_CURRENCY_CODE', '"EUR"'
+        buildConfigField 'double', 'DEFAULT_BASE_CURRENCY_AMOUNT', '100.0'
     }
     buildTypes {
         release {
