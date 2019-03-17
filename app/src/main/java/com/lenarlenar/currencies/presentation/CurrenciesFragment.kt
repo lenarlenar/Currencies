@@ -50,7 +50,7 @@ class CurrenciesFragment : Fragment() {
 
             currenciesAdapter.updateData(it!!.currencies)
 
-            if(it!!.baseCurrencyChanged){
+            if(it.baseCurrencyChanged){
                 linaerLayoutManager.scrollToPositionWithOffset(0,0)
 
             }

@@ -40,6 +40,9 @@ class CurrenciesViewModel @Inject constructor(private val currenciesRepository: 
 
     private fun getRatesWithBase() = currenciesRepository.getRates(currentBaseCurrency.value!!.code)
         .map {
+            it.rates.forEach {
+                it.rate = it.rate * currentBaseCurrency.value!!.rate
+            }
             listOf(currentBaseCurrency.value!!, *it.rates.toTypedArray())
         }
 
