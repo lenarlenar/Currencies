@@ -13,17 +13,17 @@ import dagger.multibindings.IntoMap
 
 
 @Module
-interface AppModule{
+abstract class AppModule{
 
     @Binds
     @Singleton
-    fun bindRepository(repo: CurrenciesRepositoryImpl): CurrenciesRepository
+    abstract fun bindRepository(repo: CurrenciesRepositoryImpl): CurrenciesRepository
 
     @Binds
-    fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory
+    abstract fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory
 
     @Binds
     @IntoMap
     @ViewModelKey(CurrenciesViewModel::class)
-    fun bindCurrenciesViewModel(currenciesViewModel: CurrenciesViewModel): ViewModel
+    abstract fun bindCurrenciesViewModel(currenciesViewModel: CurrenciesViewModel): ViewModel
 }

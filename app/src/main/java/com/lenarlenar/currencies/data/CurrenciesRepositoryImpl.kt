@@ -3,10 +3,14 @@ package com.lenarlenar.currencies.data
 import com.lenarlenar.currencies.domain.CurrenciesRepository
 import com.lenarlenar.currencies.domain.models.RatesResponse
 import io.reactivex.Observable
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
-class CurrenciesRepositoryImpl @Inject constructor(): CurrenciesRepository {
+class CurrenciesRepositoryImpl @Inject constructor(private val currenciesApiService: CurrenciesApiService): CurrenciesRepository {
+
     override fun getRates(base: String): Observable<RatesResponse> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return currenciesApiService
+                .getRates(base)
+                .subscribeOn(Schedulers.io())
     }
 }

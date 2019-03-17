@@ -1,14 +1,17 @@
 package com.lenarlenar.currencies.presentation
 
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.lenarlenar.currencies.App
 
 import com.lenarlenar.currencies.R
+import kotlinx.android.synthetic.main.fragment_currencies.*
 import javax.inject.Inject
 
 
@@ -18,6 +21,7 @@ class CurrenciesFragment : Fragment() {
     lateinit var viewModelFactory: ViewModelFactory
 
     private lateinit var viewModel: CurrenciesViewModel
+    private lateinit var currenciesAdapter: CurrenciesAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +40,32 @@ class CurrenciesFragment : Fragment() {
         App.appComponent.inject(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(CurrenciesViewModel::class.java)
 
+        currenciesAdapter = CurrenciesAdapter()
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.adapter = currenciesAdapter
+        recyclerView.setHasFixedSize(true)
+
+        viewModel.currencies.observe(this, Observer{
+            currenciesAdapter.updateData(it!!)
+        })
     }
+
+    override fun onStart() {
+        super.onStart()
+
+        viewModel.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        viewModel.onStop()
+    }
+
+
+
+
+
 
 
     companion object {
