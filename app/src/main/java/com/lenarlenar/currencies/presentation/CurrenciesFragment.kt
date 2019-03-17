@@ -40,13 +40,20 @@ class CurrenciesFragment : Fragment() {
         App.appComponent.inject(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(CurrenciesViewModel::class.java)
 
-        currenciesAdapter = CurrenciesAdapter()
-        recyclerView.layoutManager = LinearLayoutManager(context)
+        currenciesAdapter = CurrenciesAdapter(viewModel.currentBaseCurrency)
+        val linaerLayoutManager = LinearLayoutManager(context);
+        recyclerView.layoutManager = linaerLayoutManager
         recyclerView.adapter = currenciesAdapter
         recyclerView.setHasFixedSize(true)
 
-        viewModel.currencies.observe(this, Observer{
-            currenciesAdapter.updateData(it!!)
+        viewModel.currenciesStateModel.observe(this, Observer{
+
+            currenciesAdapter.updateData(it!!.currencies)
+
+            if(it!!.baseCurrencyChanged){
+                linaerLayoutManager.scrollToPositionWithOffset(0,0)
+
+            }
         })
     }
 
@@ -61,12 +68,6 @@ class CurrenciesFragment : Fragment() {
 
         viewModel.onStop()
     }
-
-
-
-
-
-
 
     companion object {
 

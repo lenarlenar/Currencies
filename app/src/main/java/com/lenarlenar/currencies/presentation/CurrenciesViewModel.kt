@@ -6,45 +6,58 @@ import android.arch.lifecycle.ViewModel
 import com.lenarlenar.currencies.domain.CurrenciesRepository
 import com.lenarlenar.currencies.domain.models.Currency
 import io.reactivex.Observable
-import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class CurrenciesViewModel @Inject constructor(private val currenciesRepository: CurrenciesRepository) : ViewModel(){
 
+    val currentBaseCurrency = BehaviorSubject.create<Currency>()
+
+    private val timerObservable = Observable.interval(0, 1, TimeUnit.SECONDS)
+
+    private var currenciesStateModelDisposable: Disposable? = null
+
     private var defaultBaseCurrency = Currency("EUR", 100.0)
-    private var currenciesListDisposable: Disposable? = null
 
-    private val currentBaseCurrency = BehaviorSubject.create<Currency>()
-
-    private val _currencies = MutableLiveData<List<Currency>>()
-    val currencies: LiveData<List<Currency>> = _currencies
-
+    private val _currenciesStateModel = MutableLiveData<CurrenciesStateModel>()
+    val currenciesStateModel: LiveData<CurrenciesStateModel> = _currenciesStateModel
 
     init{
         currentBaseCurrency.onNext(defaultBaseCurrency)
     }
 
     fun onStart() {
-        currenciesListDisposable = getRates()
+        currenciesStateModelDisposable = getCurrenciesStateModel()
                                     .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(
-                                        {
-                                             _currencies.value = it.rates
-                                        }
-                                    )
+                                    .subscribe {
+                                        _currenciesStateModel.value = it
+                                    }
+
     }
 
-    fun getRates() = Observable.interval(0, 1, TimeUnit.SECONDS)
-                        .flatMap { currenciesRepository.getRates(defaultBaseCurrency.code) }
+    private fun getRatesWithBase() = currenciesRepository.getRates(currentBaseCurrency.value!!.code)
+        .map {
+            listOf(currentBaseCurrency.value!!, *it.rates.toTypedArray())
+        }
 
+    private fun createCurrenciesStateModel(baseCurrencyChanged: Boolean)
+            = getRatesWithBase().map {
+                                    CurrenciesStateModel(baseCurrencyChanged, it)
+                                }
+
+
+    private fun getCurrenciesStateModel() = Observable
+                        .merge(timerObservable.map{ false }, currentBaseCurrency.map{ true })
+                        .flatMap {
+                                baseCurrencyChanged -> createCurrenciesStateModel(baseCurrencyChanged)
+                        }
 
     fun onStop(){
-        currenciesListDisposable?.dispose()
+        currenciesStateModelDisposable?.dispose()
     }
 
+    data class CurrenciesStateModel(val baseCurrencyChanged: Boolean, val currencies: List<Currency>)
 }

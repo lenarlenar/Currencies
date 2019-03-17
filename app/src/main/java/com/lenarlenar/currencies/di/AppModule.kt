@@ -20,10 +20,12 @@ abstract class AppModule{
     abstract fun bindRepository(repo: CurrenciesRepositoryImpl): CurrenciesRepository
 
     @Binds
+    @Singleton
     abstract fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory
 
     @Binds
     @IntoMap
     @ViewModelKey(CurrenciesViewModel::class)
+    @Singleton
     abstract fun bindCurrenciesViewModel(currenciesViewModel: CurrenciesViewModel): ViewModel
 }
