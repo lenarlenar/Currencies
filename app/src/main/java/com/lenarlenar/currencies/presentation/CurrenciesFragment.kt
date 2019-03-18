@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.lenarlenar.currencies.helpers.ImageLoader
 import com.lenarlenar.currencies.App
 
 import com.lenarlenar.currencies.R
@@ -19,6 +20,9 @@ class CurrenciesFragment : Fragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
+
+    @Inject
+    lateinit var imageLoader: ImageLoader
 
     private lateinit var viewModel: CurrenciesViewModel
     private lateinit var currenciesAdapter: CurrenciesAdapter
@@ -40,7 +44,7 @@ class CurrenciesFragment : Fragment() {
         App.appComponent.inject(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(CurrenciesViewModel::class.java)
 
-        currenciesAdapter = CurrenciesAdapter(viewModel.currentBaseCurrency)
+        currenciesAdapter = CurrenciesAdapter(viewModel.currentBaseCurrency, imageLoader)
         val linaerLayoutManager = LinearLayoutManager(context);
         recyclerView.layoutManager = linaerLayoutManager
         recyclerView.adapter = currenciesAdapter
@@ -48,7 +52,7 @@ class CurrenciesFragment : Fragment() {
 
         viewModel.currenciesStateModel.observe(this, Observer{
 
-            currenciesAdapter.updateData(it!!.currencies)
+            currenciesAdapter.swap(it!!.currencies)
 
             if(it.baseCurrencyChanged){
                 linaerLayoutManager.scrollToPositionWithOffset(0,0)

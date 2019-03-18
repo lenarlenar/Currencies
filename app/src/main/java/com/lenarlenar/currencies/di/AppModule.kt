@@ -1,31 +1,41 @@
 package com.lenarlenar.currencies.di
 
+import android.app.Application
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
+import android.content.Context
 import com.lenarlenar.currencies.data.CurrenciesRepositoryImpl
 import com.lenarlenar.currencies.domain.CurrenciesRepository
+import com.lenarlenar.currencies.helpers.ImageLoader
+import com.lenarlenar.currencies.helpers.ImageLoaderImp
 import com.lenarlenar.currencies.presentation.CurrenciesViewModel
 import com.lenarlenar.currencies.presentation.ViewModelFactory
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import javax.inject.Singleton
 import dagger.multibindings.IntoMap
 
 
 @Module
-abstract class AppModule{
+interface AppModule{
 
     @Binds
     @Singleton
-    abstract fun bindRepository(repo: CurrenciesRepositoryImpl): CurrenciesRepository
+    fun bindRepository(repo: CurrenciesRepositoryImpl): CurrenciesRepository
 
     @Binds
     @Singleton
-    abstract fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory
+    fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory
 
     @Binds
     @IntoMap
     @ViewModelKey(CurrenciesViewModel::class)
     @Singleton
-    abstract fun bindCurrenciesViewModel(currenciesViewModel: CurrenciesViewModel): ViewModel
+    fun bindCurrenciesViewModel(currenciesViewModel: CurrenciesViewModel): ViewModel
+
+    @Binds
+    @Singleton
+    fun provideImageLoader(imageLoader: ImageLoaderImp) : ImageLoader
+
 }

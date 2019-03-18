@@ -36,5 +36,4 @@ object NetworkModule{
             .build()
             .create(CurrenciesApiService::class.java)
     }
-
 }

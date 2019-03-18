@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.lenarlenar.currencies.BuildConfig
+import com.lenarlenar.currencies.helpers.CurrencyUtil
 import com.lenarlenar.currencies.domain.CurrenciesRepository
 import com.lenarlenar.currencies.domain.models.Currency
 import io.reactivex.Observable
@@ -17,11 +18,17 @@ class CurrenciesViewModel @Inject constructor(private val currenciesRepository: 
 
     val currentBaseCurrency = BehaviorSubject.create<Currency>()
 
+
     private val timerObservable = Observable.interval(0, BuildConfig.UPDATE_INTERVAL_SECONDS_AMOUNT, TimeUnit.SECONDS)
 
     private var currenciesStateModelDisposable: Disposable? = null
 
-    private var defaultBaseCurrency = Currency(BuildConfig.DEFAULT_BASE_CURRENCY_CODE, BuildConfig.DEFAULT_BASE_CURRENCY_AMOUNT)
+    private var defaultBaseCurrency = Currency(BuildConfig.DEFAULT_BASE_CURRENCY_CODE
+                                                , BuildConfig.DEFAULT_BASE_CURRENCY_AMOUNT
+                                                , CurrencyUtil.getNameByCode(BuildConfig.DEFAULT_BASE_CURRENCY_CODE)
+                                                , CurrencyUtil.getFlagPathByCode(BuildConfig.DEFAULT_BASE_CURRENCY_CODE))
+
+
 
     private val _currenciesStateModel = MutableLiveData<CurrenciesStateModel>()
     val currenciesStateModel: LiveData<CurrenciesStateModel> = _currenciesStateModel
@@ -40,12 +47,17 @@ class CurrenciesViewModel @Inject constructor(private val currenciesRepository: 
     }
 
     private fun getRatesWithBase() = currenciesRepository.getRates(currentBaseCurrency.value!!.code)
-        .map {
-            it.rates.forEach {
-                it.rate = it.rate * currentBaseCurrency.value!!.rate
-            }
-            listOf(currentBaseCurrency.value!!, *it.rates.toTypedArray())
-        }
+                                        .map { currencies ->
+
+                                            currencies.rates.forEach {
+                                                it.rate = it.rate * currentBaseCurrency.value!!.rate
+                                                it.name = CurrencyUtil.getNameByCode(it.code)
+                                                it.flagUrl = CurrencyUtil.getFlagPathByCode(it.code)
+                                            }
+
+                                            listOf(currentBaseCurrency.value!!, *currencies.rates.toTypedArray())
+                                        }
+
 
     private fun createCurrenciesStateModel(baseCurrencyChanged: Boolean)
             = getRatesWithBase().map {
@@ -56,7 +68,8 @@ class CurrenciesViewModel @Inject constructor(private val currenciesRepository: 
     private fun getCurrenciesStateModel() = Observable
                         .merge(timerObservable.map{ false }, currentBaseCurrency.map{ true })
                         .flatMap {
-                                baseCurrencyChanged -> createCurrenciesStateModel(baseCurrencyChanged)
+                                baseCurrencyChanged ->
+                                    createCurrenciesStateModel(baseCurrencyChanged)
                         }
 
     fun onStop(){
