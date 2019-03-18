@@ -1,5 +1,7 @@
 package com.lenarlenar.currencies.helpers
 
+import com.lenarlenar.currencies.BuildConfig
+
 class CurrencyUtil{
     companion object {
         private val namesMap = hashMapOf(
@@ -176,7 +178,11 @@ class CurrencyUtil{
         "ZWL" to "Zimbabwean Dollar"
         )
 
-        fun getFlagPathByCode(code: String) = "file:///android_asset/flags/${code.substring(0, 2).toLowerCase()}.png"
+        private fun getCountryCodeByCurrencyCode(code: String) = code.substring(0, 2).toLowerCase()
+
+        fun getFlagPathByCode(code: String) = "${BuildConfig.FLAGS_BASE_PATH}" +
+                                                "${getCountryCodeByCurrencyCode(code)}" +
+                                                    ".${BuildConfig.FLAGS_EXT}"
 
         fun getNameByCode(code: String) = namesMap[code]
     }

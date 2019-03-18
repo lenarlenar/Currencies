@@ -20,6 +20,8 @@ android {
         buildConfigField 'long', 'UPDATE_INTERVAL_SECONDS_AMOUNT', '1'
         buildConfigField 'String', 'DEFAULT_BASE_CURRENCY_CODE', '"EUR"'
         buildConfigField 'double', 'DEFAULT_BASE_CURRENCY_AMOUNT', '100.0'
+        buildConfigField 'String', 'FLAGS_BASE_PATH', '"file:///android_asset/flags/"'
+        buildConfigField 'String', 'FLAGS_EXT', '"png"'
     }
     buildTypes {
         release {
