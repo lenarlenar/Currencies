@@ -6,8 +6,7 @@ import android.arch.lifecycle.ViewModelProvider
 import android.content.Context
 import com.lenarlenar.currencies.data.CurrenciesRepositoryImpl
 import com.lenarlenar.currencies.domain.CurrenciesRepository
-import com.lenarlenar.currencies.helpers.ImageLoader
-import com.lenarlenar.currencies.helpers.ImageLoaderImp
+import com.lenarlenar.currencies.helpers.*
 import com.lenarlenar.currencies.presentation.CurrenciesViewModel
 import com.lenarlenar.currencies.presentation.ViewModelFactory
 import dagger.Binds
@@ -36,6 +35,14 @@ interface AppModule{
 
     @Binds
     @Singleton
-    fun provideImageLoader(imageLoader: ImageLoaderImp) : ImageLoader
+    fun bindImageLoader(imageLoader: ImageLoaderImp) : ImageLoader
+
+    @Binds
+    @Singleton
+    fun bindSchedulerProvider(schedulerProvider: SchedulerProviderImpl) : SchedulerProvider
+
+    @Binds
+    @Singleton
+    fun bindRefreshCommander(refreshCommander: RefreshCommanderImpl) : RefreshCommander<Long>
 
 }

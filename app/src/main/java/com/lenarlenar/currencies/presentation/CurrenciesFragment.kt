@@ -50,7 +50,7 @@ class CurrenciesFragment : Fragment() {
         recyclerView.adapter = currenciesAdapter
         recyclerView.setHasFixedSize(true)
 
-        viewModel.currenciesStateModel.observe(this, Observer{
+        viewModel.currencyRatesUiModel.observe(this, Observer{
 
             currenciesAdapter.swap(it!!.currencies)
 

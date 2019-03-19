@@ -7,21 +7,20 @@ import com.lenarlenar.currencies.BuildConfig
 import com.lenarlenar.currencies.helpers.CurrencyUtil
 import com.lenarlenar.currencies.domain.CurrenciesRepository
 import com.lenarlenar.currencies.domain.models.Currency
+import com.lenarlenar.currencies.helpers.RefreshCommander
+import com.lenarlenar.currencies.helpers.SchedulerProvider
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.BehaviorSubject
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class CurrenciesViewModel @Inject constructor(private val currenciesRepository: CurrenciesRepository) : ViewModel(){
+class CurrenciesViewModel @Inject constructor(private val currenciesRepository: CurrenciesRepository
+                                              , private val  schedulerProvider: SchedulerProvider
+                                              , private val refreshCommander: RefreshCommander<Long> ) : ViewModel(){
 
     val currentBaseCurrency = BehaviorSubject.create<Currency>()
 
-
-    private val timerObservable = Observable.interval(0, BuildConfig.UPDATE_INTERVAL_SECONDS_AMOUNT, TimeUnit.SECONDS)
-
-    private var currenciesStateModelDisposable: Disposable? = null
+    private var currencyRatesUiModelDisposer: Disposable? = null
 
     private var defaultBaseCurrency = Currency(BuildConfig.DEFAULT_BASE_CURRENCY_CODE
                                                 , BuildConfig.DEFAULT_BASE_CURRENCY_AMOUNT
@@ -30,51 +29,61 @@ class CurrenciesViewModel @Inject constructor(private val currenciesRepository: 
 
 
 
-    private val _currenciesStateModel = MutableLiveData<CurrenciesStateModel>()
-    val currenciesStateModel: LiveData<CurrenciesStateModel> = _currenciesStateModel
+    private val _currencyRatesUiModel = MutableLiveData<CurrencyRatesUiModel>()
+    val currencyRatesUiModel: LiveData<CurrencyRatesUiModel> = _currencyRatesUiModel
 
     init{
         currentBaseCurrency.onNext(defaultBaseCurrency)
     }
 
     fun onStart() {
-        currenciesStateModelDisposable = getCurrenciesStateModel()
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe {
-                                        _currenciesStateModel.value = it
-                                    }
+
+        currencyRatesUiModelDisposer = getCurrencyRatesUiModel()
+                                    .observeOn(schedulerProvider.ui())
+                                    .subscribe (
+                                        {
+
+                                            _currencyRatesUiModel.value = it
+                                        }
+
+                                    )
+
 
     }
 
     private fun getRatesWithBase() = currenciesRepository.getRates(currentBaseCurrency.value!!.code)
                                         .map { currencies ->
 
+                                            val result = mutableListOf<Currency>()
                                             currencies.rates.forEach {
-                                                it.rate = it.rate * currentBaseCurrency.value!!.rate
-                                                it.name = CurrencyUtil.getNameByCode(it.code)
-                                                it.flagUrl = CurrencyUtil.getFlagPathByCode(it.code)
+
+                                                val rate = it.rate * currentBaseCurrency.value!!.rate
+                                                val name = CurrencyUtil.getNameByCode(it.code)
+                                                val flagUrl = CurrencyUtil.getFlagPathByCode(it.code)
+
+                                                result.add(Currency(it.code, rate, name, flagUrl))
                                             }
 
-                                            listOf(currentBaseCurrency.value!!, *currencies.rates.toTypedArray())
+                                            listOf(currentBaseCurrency.value!!, *result.toTypedArray())
                                         }
 
 
-    private fun createCurrenciesStateModel(baseCurrencyChanged: Boolean)
-            = getRatesWithBase().map {
-                                    CurrenciesStateModel(baseCurrencyChanged, it)
-                                }
+    private fun createCurrencyRatesUiModel(baseCurrencyChanged: Boolean)
+                        = getRatesWithBase().map {
+                                                CurrencyRatesUiModel(baseCurrencyChanged, it)
+                                            }
 
 
-    private fun getCurrenciesStateModel() = Observable
-                        .merge(timerObservable.map{ false }, currentBaseCurrency.map{ true })
+    private fun getCurrencyRatesUiModel()
+                        = Observable.merge(refreshCommander.`do`().map{ false }, currentBaseCurrency.map{ true })
                         .flatMap {
                                 baseCurrencyChanged ->
-                                    createCurrenciesStateModel(baseCurrencyChanged)
+                                    createCurrencyRatesUiModel(baseCurrencyChanged)
                         }
 
     fun onStop(){
-        currenciesStateModelDisposable?.dispose()
+        currencyRatesUiModelDisposer?.dispose()
     }
 
-    data class CurrenciesStateModel(val baseCurrencyChanged: Boolean, val currencies: List<Currency>)
+    data class CurrencyRatesUiModel(val baseCurrencyChanged: Boolean, val currencies: List<Currency>)
 }

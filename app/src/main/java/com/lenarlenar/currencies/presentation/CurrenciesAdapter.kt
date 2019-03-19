@@ -77,8 +77,8 @@ class CurrenciesAdapter (private val currentBaseCurrency: BehaviorSubject<Curren
 
             if(position == baseItemPosition){
                 val text = it.trim()
-                val currency = items[position]
-                currency.rate = if(text.isNotEmpty()) toDouble(text) else 0.0
+                var currency = items[position]
+                currency = Currency(currency.code, if(text.isNotEmpty()) toDouble(text) else 0.0)
                 currentBaseCurrency.onNext(currency)
             }
         }
