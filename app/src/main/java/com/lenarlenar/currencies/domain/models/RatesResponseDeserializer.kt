@@ -12,11 +12,11 @@ class RatesResponseDeserializer : JsonDeserializer<RatesResponse>{
 
         val currenciesRatesResponseJsonObject = json?.asJsonObject
 
-        val currencies = mutableListOf<Currency>()
+        val currencies = mutableMapOf<String, Double>()
         val currenciesRatesJsonObject = currenciesRatesResponseJsonObject?.get("rates")?.asJsonObject
 
         currenciesRatesJsonObject?.entrySet()?.forEach {
-            currencies.add(Currency(it.key, it.value.asDouble))
+            currencies[it.key] = it.value.asDouble
         }
 
         val ratesResponse = RatesResponse(

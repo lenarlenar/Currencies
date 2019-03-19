@@ -45,4 +45,8 @@ interface AppModule{
     @Singleton
     fun bindRefreshCommander(refreshCommander: RefreshCommanderImpl) : RefreshCommander<Long>
 
+    @Binds
+    @Singleton
+    fun bindCurrencySettings(currencySettings: CurrencySettingsImpl) : CurrencySettings
+
 }

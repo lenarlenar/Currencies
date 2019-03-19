@@ -4,6 +4,8 @@ import android.arch.core.executor.testing.InstantTaskExecutorRule
 import com.lenarlenar.currencies.domain.CurrenciesRepository
 import com.lenarlenar.currencies.domain.models.Currency
 import com.lenarlenar.currencies.domain.models.RatesResponse
+import com.lenarlenar.currencies.helpers.CurrencySettings
+import com.lenarlenar.currencies.helpers.CurrencySettingsImpl
 import com.lenarlenar.currencies.helpers.RefreshCommander
 import com.lenarlenar.currencies.helpers.SchedulerProvider
 import com.lenarlenar.currencies.presentation.CurrenciesViewModel
@@ -40,7 +42,7 @@ class CurrenciesViewModelTest{
             override fun `do`(): Observable<Long>  = Observable.empty()
         }
 
-        this.currenciesViewModel = CurrenciesViewModel(currenciesRepository, schedulerProvider, refreshCommander)
+        this.currenciesViewModel = CurrenciesViewModel(currenciesRepository, schedulerProvider, refreshCommander, CurrencySettingsImpl())
 
         Mockito.`when`(currenciesRepository.getRates(anyString()))
             .thenAnswer {Observable.just(ratesResponse)}
@@ -74,19 +76,20 @@ class CurrenciesViewModelTest{
     @Test
     fun `when base currency rate changed other rates changing too`(){
 
-        var anotherCurrency = Currency("CO1", 2.4)
+        val anotherCurrencyCode = "CO1"
+        var anotherCurrencies = mapOf(anotherCurrencyCode to 2.4)
 
         Mockito.`when`(ratesResponse.rates)
-            .thenAnswer { listOf(anotherCurrency) }
+            .thenAnswer { anotherCurrencies }
 
         currenciesViewModel.onStart()
 
         val newBaseCurrency = Currency("CO2", 4.0)
         currenciesViewModel.currentBaseCurrency.onNext(newBaseCurrency)
 
-        val baseRateFromCurrenciesStateModel = this.currenciesViewModel.currencyRatesUiModel.value!!.currencies.firstOrNull{ it.code == anotherCurrency.code}
+        val baseRateFromCurrenciesStateModel = this.currenciesViewModel.currencyRatesUiModel.value!!.currencies.firstOrNull{ it.code == anotherCurrencyCode}
 
-        Assert.assertTrue((newBaseCurrency.rate * anotherCurrency.rate).equals(baseRateFromCurrenciesStateModel!!.rate))
+        Assert.assertTrue((newBaseCurrency.rate * anotherCurrencies[anotherCurrencyCode]!!).equals(baseRateFromCurrenciesStateModel!!.rate))
     }
 
 }

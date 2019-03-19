@@ -1,9 +1,18 @@
 package com.lenarlenar.currencies.helpers
 
 import com.lenarlenar.currencies.BuildConfig
+import com.lenarlenar.currencies.domain.models.Currency
+import javax.inject.Inject
 
-class CurrencyUtil{
-    companion object {
+
+interface CurrencySettings{
+    val defaultBaseCurrency : Currency
+    fun getFlagPathByCode(code: String) : String
+    fun getNameByCode(code: String) : String?
+}
+
+class CurrencySettingsImpl @Inject constructor() : CurrencySettings{
+
         private val namesMap = hashMapOf(
         "AED" to "United Arab Emirates Dirham",
         "AFN" to "Afghan Afghani",
@@ -178,12 +187,27 @@ class CurrencyUtil{
         "ZWL" to "Zimbabwean Dollar"
         )
 
+        private val flagPathsCache = mutableMapOf<String, String>()
+
         private fun getCountryCodeByCurrencyCode(code: String) = code.substring(0, 2).toLowerCase()
 
-        fun getFlagPathByCode(code: String) = "${BuildConfig.FLAGS_BASE_PATH}" +
-                                                "${getCountryCodeByCurrencyCode(code)}" +
-                                                    ".${BuildConfig.FLAGS_EXT}"
+        override fun getFlagPathByCode(code: String) : String{
 
-        fun getNameByCode(code: String) = namesMap[code]
-    }
+            if(flagPathsCache[code] == null){
+                flagPathsCache[code] = "${BuildConfig.FLAGS_BASE_PATH}" +
+                        "${getCountryCodeByCurrencyCode(code)}" +
+                        ".${BuildConfig.FLAGS_EXT}"
+            }
+
+            return flagPathsCache[code]!!
+        }
+
+        override fun getNameByCode(code: String) = namesMap[code]
+
+        override val defaultBaseCurrency = Currency(BuildConfig.DEFAULT_BASE_CURRENCY_CODE
+                                            , BuildConfig.DEFAULT_BASE_CURRENCY_AMOUNT
+                                            , getNameByCode(BuildConfig.DEFAULT_BASE_CURRENCY_CODE)
+                                            , getFlagPathByCode(BuildConfig.DEFAULT_BASE_CURRENCY_CODE)
+        )
+
 }
