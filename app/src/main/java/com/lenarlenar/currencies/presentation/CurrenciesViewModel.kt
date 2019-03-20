@@ -5,7 +5,8 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.lenarlenar.currencies.domain.CurrenciesRepository
 import com.lenarlenar.currencies.domain.models.Currency
-import com.lenarlenar.currencies.helpers.CurrencySettings
+import com.lenarlenar.currencies.domain.models.CurrencyHelper
+import com.lenarlenar.currencies.domain.models.CurrencySettings
 import com.lenarlenar.currencies.domain.models.RefreshCommander
 import com.lenarlenar.currencies.helpers.SchedulerProvider
 import io.reactivex.Observable
@@ -78,8 +79,8 @@ class CurrenciesViewModel @Inject constructor(
                         Currency(
                             it.key
                             , it.value * currentBaseCurrency.value!!.rate
-                            , currencySettings.getNameByCode(it.key)
-                            , currencySettings.getFlagPathByCode(it.key)
+                            , CurrencyHelper.getNameByCode(it.key)
+                            , CurrencyHelper.getFlagPathByCode(it.key)
                         )
                     )
                 }

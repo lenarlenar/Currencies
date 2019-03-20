@@ -14,7 +14,6 @@ import com.lenarlenar.currencies.domain.models.Currency
 import com.lenarlenar.currencies.helpers.ImageLoader
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.recycleritem_currency.view.*
-import java.lang.Exception
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.text.NumberFormat
@@ -141,28 +140,26 @@ class CurrenciesAdapter(
             }
         })
     }
+}
 
-    companion object {
-        private fun toFormatString(number: Double): String {
+private fun toFormatString(number: Double): String {
 
-            if (number.equals(0.0))
-                return " "
+    if (number.equals(0.0))
+        return " "
 
-            val symbols = DecimalFormatSymbols()
-            symbols.setGroupingSeparator(' ')
-            val format = DecimalFormat("#,##0.00", symbols)
+    val symbols = DecimalFormatSymbols()
+    symbols.setGroupingSeparator(' ')
+    val format = DecimalFormat("#,##0.00", symbols)
 
-            return format.format(number)
-        }
+    return format.format(number)
+}
 
-        private fun toDouble(str: String): Double {
+private fun toDouble(str: String): Double {
 
-            if (str.isEmpty() || str.equals(".") || str.equals(","))
-                return 0.0
+    if (str.isEmpty() || str.equals(".") || str.equals(","))
+        return 0.0
 
-            val format = NumberFormat.getInstance()
-            val number = format.parse(str)
-            return number.toDouble()
-        }
-    }
+    val format = NumberFormat.getInstance()
+    val number = format.parse(str)
+    return number.toDouble()
 }

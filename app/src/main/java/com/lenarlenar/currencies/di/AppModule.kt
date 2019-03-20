@@ -4,9 +4,14 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import com.lenarlenar.currencies.data.CurrenciesRepositoryImpl
 import com.lenarlenar.currencies.domain.CurrenciesRepository
+import com.lenarlenar.currencies.domain.models.CurrencySettings
+import com.lenarlenar.currencies.domain.models.CurrencySettingsImpl
 import com.lenarlenar.currencies.domain.models.RefreshCommander
 import com.lenarlenar.currencies.domain.models.RefreshCommanderImpl
-import com.lenarlenar.currencies.helpers.*
+import com.lenarlenar.currencies.helpers.ImageLoader
+import com.lenarlenar.currencies.helpers.ImageLoaderImp
+import com.lenarlenar.currencies.helpers.SchedulerProvider
+import com.lenarlenar.currencies.helpers.SchedulerProviderImpl
 import com.lenarlenar.currencies.presentation.CurrenciesViewModel
 import com.lenarlenar.currencies.presentation.ViewModelFactory
 import dagger.Binds

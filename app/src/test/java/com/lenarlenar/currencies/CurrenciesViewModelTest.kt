@@ -1,11 +1,10 @@
 package com.lenarlenar.currencies
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.util.Log
 import com.lenarlenar.currencies.domain.CurrenciesRepository
 import com.lenarlenar.currencies.domain.models.Currency
+import com.lenarlenar.currencies.domain.models.CurrencySettingsImpl
 import com.lenarlenar.currencies.domain.models.RatesResponse
-import com.lenarlenar.currencies.helpers.CurrencySettingsImpl
 import com.lenarlenar.currencies.domain.models.RefreshCommander
 import com.lenarlenar.currencies.helpers.SchedulerProvider
 import com.lenarlenar.currencies.presentation.CurrenciesViewModel
@@ -44,7 +43,9 @@ class CurrenciesViewModelTest {
         }
 
         this.currenciesViewModel =
-            CurrenciesViewModel(currenciesRepository, schedulerProvider, refreshCommander, CurrencySettingsImpl())
+            CurrenciesViewModel(currenciesRepository, schedulerProvider, refreshCommander,
+                CurrencySettingsImpl()
+            )
 
         Mockito.`when`(currenciesRepository.getRates(anyString()))
             .thenAnswer { Single.just(ratesResponse) }
