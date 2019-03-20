@@ -20,7 +20,6 @@ class CurrenciesViewModel @Inject constructor(private val currenciesRepository: 
 
     private var currencyRatesUiModelDisposer: Disposable? = null
 
-
     private val _currencyRatesUiModel = MutableLiveData<CurrencyRatesUiModel>()
     val currencyRatesUiModel: LiveData<CurrencyRatesUiModel> = _currencyRatesUiModel
 
