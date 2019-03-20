@@ -1,7 +1,6 @@
 package com.lenarlenar.currencies.domain
 
 import com.lenarlenar.currencies.domain.models.RatesResponse
-import io.reactivex.Observable
 import io.reactivex.Single
 
 interface CurrenciesRepository {

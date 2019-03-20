@@ -4,7 +4,7 @@ import android.app.Application
 import com.lenarlenar.currencies.di.AppComponent
 import com.lenarlenar.currencies.di.DaggerAppComponent
 
-class App : Application(){
+class App : Application() {
     companion object {
         lateinit var appComponent: AppComponent
     }
@@ -14,5 +14,4 @@ class App : Application(){
 
         appComponent = DaggerAppComponent.builder().build()
     }
-
 }

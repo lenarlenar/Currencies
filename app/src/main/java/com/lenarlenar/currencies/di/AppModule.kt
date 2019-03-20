@@ -1,23 +1,22 @@
 package com.lenarlenar.currencies.di
 
-import android.app.Application
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
-import android.content.Context
 import com.lenarlenar.currencies.data.CurrenciesRepositoryImpl
 import com.lenarlenar.currencies.domain.CurrenciesRepository
+import com.lenarlenar.currencies.domain.models.RefreshCommander
+import com.lenarlenar.currencies.domain.models.RefreshCommanderImpl
 import com.lenarlenar.currencies.helpers.*
 import com.lenarlenar.currencies.presentation.CurrenciesViewModel
 import com.lenarlenar.currencies.presentation.ViewModelFactory
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
-import javax.inject.Singleton
 import dagger.multibindings.IntoMap
+import javax.inject.Singleton
 
 
 @Module
-interface AppModule{
+interface AppModule {
 
     @Binds
     @Singleton
@@ -35,18 +34,18 @@ interface AppModule{
 
     @Binds
     @Singleton
-    fun bindImageLoader(imageLoader: ImageLoaderImp) : ImageLoader
+    fun bindImageLoader(imageLoader: ImageLoaderImp): ImageLoader
 
     @Binds
     @Singleton
-    fun bindSchedulerProvider(schedulerProvider: SchedulerProviderImpl) : SchedulerProvider
+    fun bindSchedulerProvider(schedulerProvider: SchedulerProviderImpl): SchedulerProvider
 
     @Binds
     @Singleton
-    fun bindRefreshCommander(refreshCommander: RefreshCommanderImpl) : RefreshCommander<Long>
+    fun bindRefreshCommander(refreshCommander: RefreshCommanderImpl): RefreshCommander<Long>
 
     @Binds
     @Singleton
-    fun bindCurrencySettings(currencySettings: CurrencySettingsImpl) : CurrencySettings
+    fun bindCurrencySettings(currencySettings: CurrencySettingsImpl): CurrencySettings
 
 }

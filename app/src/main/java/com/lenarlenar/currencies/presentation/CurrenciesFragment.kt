@@ -9,10 +9,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.lenarlenar.currencies.helpers.ImageLoader
 import com.lenarlenar.currencies.App
-
 import com.lenarlenar.currencies.R
+import com.lenarlenar.currencies.helpers.ImageLoader
 import kotlinx.android.synthetic.main.fragment_currencies.*
 import javax.inject.Inject
 
@@ -51,17 +50,17 @@ class CurrenciesFragment : Fragment() {
         recyclerView.adapter = currenciesAdapter
         recyclerView.setHasFixedSize(true)
 
-        viewModel.currencyRatesUiModel.observe(this, Observer{
+        viewModel.currencyRatesUiModel.observe(this, Observer {
 
-            if(it!!.status == CurrenciesViewModel.CurrencyRatesUiModel.Status.ERROR) {
+            if (it!!.status == CurrenciesViewModel.CurrencyRatesUiModel.Status.ERROR) {
                 Toast.makeText(context, "Error loading...Try again...", Toast.LENGTH_SHORT).show()
 
             }
 
-            currenciesAdapter.swap(it.currencies!!)
+            currenciesAdapter.swap(it.currencies)
 
-            if(it.baseCurrencyChanged!!){
-                linaerLayoutManager.scrollToPositionWithOffset(0,0)
+            if (it.baseCurrencyChanged) {
+                linaerLayoutManager.scrollToPositionWithOffset(0, 0)
 
             }
         })

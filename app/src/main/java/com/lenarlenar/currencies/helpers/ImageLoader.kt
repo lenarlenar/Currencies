@@ -1,6 +1,5 @@
 package com.lenarlenar.currencies.helpers
 
-import android.content.Context
 import android.widget.ImageView
 import com.squareup.picasso.Picasso
 import javax.inject.Inject

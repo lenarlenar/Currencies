@@ -4,8 +4,8 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.lenarlenar.currencies.BuildConfig
 import com.lenarlenar.currencies.data.CurrenciesApiService
-import com.lenarlenar.currencies.domain.models.RatesResponseDeserializer
 import com.lenarlenar.currencies.domain.models.RatesResponse
+import com.lenarlenar.currencies.helpers.RatesResponseDeserializer
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
@@ -14,15 +14,17 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
-object NetworkModule{
+object NetworkModule {
 
     @JvmStatic
     @Singleton
     @Provides
     fun provideGson(): Gson =
-                    GsonBuilder()
-                        .registerTypeAdapter(RatesResponse::class.java, RatesResponseDeserializer())
-                        .create()
+        GsonBuilder()
+            .registerTypeAdapter(RatesResponse::class.java,
+                RatesResponseDeserializer()
+            )
+            .create()
 
 
     @JvmStatic

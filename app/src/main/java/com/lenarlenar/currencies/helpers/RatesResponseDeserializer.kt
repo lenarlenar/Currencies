@@ -1,13 +1,12 @@
-package com.lenarlenar.currencies.domain.models
+package com.lenarlenar.currencies.helpers
 
-import android.provider.Telephony
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
+import com.lenarlenar.currencies.domain.models.RatesResponse
 import java.lang.reflect.Type
-import kotlin.concurrent.fixedRateTimer
 
-class RatesResponseDeserializer : JsonDeserializer<RatesResponse>{
+class RatesResponseDeserializer : JsonDeserializer<RatesResponse> {
     override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): RatesResponse {
 
         val currenciesRatesResponseJsonObject = json?.asJsonObject
@@ -27,5 +26,4 @@ class RatesResponseDeserializer : JsonDeserializer<RatesResponse>{
 
         return ratesResponse
     }
-
 }

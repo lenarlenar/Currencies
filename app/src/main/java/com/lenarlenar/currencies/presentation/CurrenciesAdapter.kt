@@ -9,9 +9,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import com.lenarlenar.currencies.helpers.ImageLoader
 import com.lenarlenar.currencies.R
 import com.lenarlenar.currencies.domain.models.Currency
+import com.lenarlenar.currencies.helpers.ImageLoader
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.recycleritem_currency.view.*
 import java.text.DecimalFormat
@@ -19,8 +19,10 @@ import java.text.DecimalFormatSymbols
 import java.text.NumberFormat
 
 
-class CurrenciesAdapter (private val currentBaseCurrency: BehaviorSubject<Currency>, private val imageLoader: ImageLoader)
-                                                : RecyclerView.Adapter<CurrenciesAdapter.ViewHolder>(){
+class CurrenciesAdapter(
+    private val currentBaseCurrency: BehaviorSubject<Currency>,
+    private val imageLoader: ImageLoader
+) : RecyclerView.Adapter<CurrenciesAdapter.ViewHolder>() {
 
     private val items = mutableListOf<Currency>()
     private val baseItemPosition = 0
@@ -30,7 +32,7 @@ class CurrenciesAdapter (private val currentBaseCurrency: BehaviorSubject<Curren
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currency = items[position]
 
-        if(holder.view.code.text == currency.code)
+        if (holder.view.code.text == currency.code)
             return
 
         holder.view.code.text = currency.code
@@ -42,9 +44,9 @@ class CurrenciesAdapter (private val currentBaseCurrency: BehaviorSubject<Curren
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
 
-        if(payloads.isEmpty()){
+        if (payloads.isEmpty()) {
             super.onBindViewHolder(holder, position, payloads)
-        }else{
+        } else {
             val bundle = payloads[0] as Bundle
             val newRate = bundle.getDouble("rate")
             holder.view.rate.setText(toFormatString(newRate))
@@ -59,26 +61,26 @@ class CurrenciesAdapter (private val currentBaseCurrency: BehaviorSubject<Curren
 
         val holder = ViewHolder(view)
         holder.view.setOnTouchListener { v, _ ->
-                v.rate.requestFocus();
-                currentBaseCurrency.onNext(items[holder.adapterPosition])
-                true
+            v.rate.requestFocus();
+            currentBaseCurrency.onNext(items[holder.adapterPosition])
+            true
         }
 
         holder.view.rate.setOnTouchListener { _, _ ->
 
-            if(holder.adapterPosition != baseItemPosition)
+            if (holder.adapterPosition != baseItemPosition)
                 currentBaseCurrency.onNext(items[holder.adapterPosition])
-             false
+            false
         }
 
 
         holder.view.rate.onTextChanged {
             val position = holder.adapterPosition
 
-            if(position == baseItemPosition){
+            if (position == baseItemPosition) {
                 val text = it.trim()
                 var currency = items[position]
-                currency = Currency(currency.code, if(text.isNotEmpty()) toDouble(text) else 0.0)
+                currency = Currency(currency.code, if (text.isNotEmpty()) toDouble(text) else 0.0)
                 currentBaseCurrency.onNext(currency)
             }
         }
@@ -98,16 +100,17 @@ class CurrenciesAdapter (private val currentBaseCurrency: BehaviorSubject<Curren
 
     class ViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
-    private class DiffUtilCallbackImpl(private val oldList: List<Currency>, private val newList: List<Currency>) : DiffUtil.Callback(){
+    private class DiffUtilCallbackImpl(private val oldList: List<Currency>, private val newList: List<Currency>) :
+        DiffUtil.Callback() {
 
         override fun getOldListSize() = oldList.size
         override fun getNewListSize() = newList.size
 
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int)
-                = oldList[oldItemPosition].code == newList[newItemPosition].code
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int) =
+            oldList[oldItemPosition].code == newList[newItemPosition].code
 
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int)
-                = oldList[oldItemPosition].rate.equals(newList[newItemPosition].rate)
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) =
+            oldList[oldItemPosition].rate.equals(newList[newItemPosition].rate)
 
         override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
             val diff = Bundle()
@@ -136,7 +139,7 @@ class CurrenciesAdapter (private val currentBaseCurrency: BehaviorSubject<Curren
     companion object {
         fun toFormatString(number: Double): String {
 
-            if(number.equals(0.0))
+            if (number.equals(0.0))
                 return " "
 
             val symbols = DecimalFormatSymbols()
