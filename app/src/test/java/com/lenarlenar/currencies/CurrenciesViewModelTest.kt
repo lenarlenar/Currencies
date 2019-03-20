@@ -1,6 +1,7 @@
 package com.lenarlenar.currencies
 
 import android.arch.core.executor.testing.InstantTaskExecutorRule
+import android.util.Log
 import com.lenarlenar.currencies.domain.CurrenciesRepository
 import com.lenarlenar.currencies.domain.models.Currency
 import com.lenarlenar.currencies.domain.models.RatesResponse
@@ -77,7 +78,7 @@ class CurrenciesViewModelTest {
     @Test
     fun `when base currency rate changed other rates changing too`() {
 
-        val anotherCurrencyCode = "CO1"
+        val anotherCurrencyCode = "EUR"
         var anotherCurrencies = mapOf(anotherCurrencyCode to 2.4)
 
         Mockito.`when`(ratesResponse.rates)
@@ -85,7 +86,7 @@ class CurrenciesViewModelTest {
 
         currenciesViewModel.onStart()
 
-        val newBaseCurrency = Currency("CO2", 4.0)
+        val newBaseCurrency = Currency("RUR", 4.0, "ANYNAME", "ANYFLAGPATH")
         currenciesViewModel.currentBaseCurrency.onNext(newBaseCurrency)
 
         val baseRateFromCurrenciesStateModel =
@@ -95,7 +96,6 @@ class CurrenciesViewModelTest {
                 baseRateFromCurrenciesStateModel.rate
             )
         )
-
     }
 
 }

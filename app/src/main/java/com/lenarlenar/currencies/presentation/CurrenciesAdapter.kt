@@ -14,10 +14,10 @@ import com.lenarlenar.currencies.domain.models.Currency
 import com.lenarlenar.currencies.helpers.ImageLoader
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.recycleritem_currency.view.*
+import java.lang.Exception
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.text.NumberFormat
-
 
 class CurrenciesAdapter(
     private val currentBaseCurrency: BehaviorSubject<Currency>,
@@ -38,8 +38,7 @@ class CurrenciesAdapter(
         holder.view.code.text = currency.code
         holder.view.name.text = currency.name
         holder.view.rate.setText(toFormatString(currency.rate))
-        imageLoader.load(holder.view.flagIcon, currency.flagUrl!!)
-
+        imageLoader.load(holder.view.flagIcon, currency.flagUrl)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
@@ -49,9 +48,11 @@ class CurrenciesAdapter(
         } else {
             val bundle = payloads[0] as Bundle
             val newRate = bundle.getDouble("rate")
-            holder.view.rate.setText(toFormatString(newRate))
-        }
 
+            val selectionPosition = holder.view.rate.selectionStart
+            holder.view.rate.setText(toFormatString(newRate))
+            holder.view.rate.setSelection(selectionPosition)
+        }
     }
 
     override fun onCreateViewHolder(p0: ViewGroup, p1: Int): ViewHolder {
@@ -60,10 +61,9 @@ class CurrenciesAdapter(
             .inflate(R.layout.recycleritem_currency, p0, false) as View
 
         val holder = ViewHolder(view)
-        holder.view.setOnTouchListener { v, _ ->
+        holder.view.setOnClickListener { v ->
             v.rate.requestFocus();
             currentBaseCurrency.onNext(items[holder.adapterPosition])
-            true
         }
 
         holder.view.rate.setOnTouchListener { _, _ ->
@@ -73,14 +73,20 @@ class CurrenciesAdapter(
             false
         }
 
-
         holder.view.rate.onTextChanged {
             val position = holder.adapterPosition
 
             if (position == baseItemPosition) {
                 val text = it.trim()
                 var currency = items[position]
-                currency = Currency(currency.code, if (text.isNotEmpty()) toDouble(text) else 0.0)
+
+                currency = Currency(
+                    currency.code
+                    , toDouble(text)
+                    , currency.name
+                    , currency.flagUrl
+                )
+
                 currentBaseCurrency.onNext(currency)
             }
         }
@@ -137,7 +143,7 @@ class CurrenciesAdapter(
     }
 
     companion object {
-        fun toFormatString(number: Double): String {
+        private fun toFormatString(number: Double): String {
 
             if (number.equals(0.0))
                 return " "
@@ -149,7 +155,11 @@ class CurrenciesAdapter(
             return format.format(number)
         }
 
-        fun toDouble(str: String): Double {
+        private fun toDouble(str: String): Double {
+
+            if (str.isEmpty() || str.equals(".") || str.equals(","))
+                return 0.0
+
             val format = NumberFormat.getInstance()
             val number = format.parse(str)
             return number.toDouble()

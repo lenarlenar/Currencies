@@ -1,5 +1,6 @@
 package com.lenarlenar.currencies.helpers
 
+import android.util.Log
 import com.lenarlenar.currencies.BuildConfig
 import com.lenarlenar.currencies.domain.models.Currency
 import javax.inject.Inject
@@ -7,10 +8,13 @@ import javax.inject.Inject
 interface CurrencySettings {
     val defaultBaseCurrency: Currency
     fun getFlagPathByCode(code: String): String
-    fun getNameByCode(code: String): String?
+    fun getNameByCode(code: String): String
 }
 
 class CurrencySettingsImpl @Inject constructor() : CurrencySettings {
+
+    private val NAMELESS_CURRENCYNAME = "nameless";
+    private val EMPTY_FLAGPATH = "";
 
     private val toNamedGroupCollection = hashMapOf(
         "AED" to "United Arab Emirates Dirham",
@@ -371,12 +375,15 @@ class CurrencySettingsImpl @Inject constructor() : CurrencySettings {
                     ".${BuildConfig.FLAGS_EXT}"
         }
 
-
-
         return flagPathsCache[code]!!
     }
 
-    override fun getNameByCode(code: String) = toNamedGroupCollection[code]
+    override fun getNameByCode(code: String) =
+        if (toNamedGroupCollection[code] != null) toNamedGroupCollection[code]!!
+        else {
+            Log.e(this.javaClass.name, "Houston, we have a problem. No name for ${code} currency code")
+            NAMELESS_CURRENCYNAME
+        }
 
     override val defaultBaseCurrency = Currency(
         BuildConfig.DEFAULT_BASE_CURRENCY_CODE
