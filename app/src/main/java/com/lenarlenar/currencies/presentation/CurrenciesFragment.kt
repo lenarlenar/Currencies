@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.lenarlenar.currencies.helpers.ImageLoader
 import com.lenarlenar.currencies.App
 
@@ -52,9 +53,14 @@ class CurrenciesFragment : Fragment() {
 
         viewModel.currencyRatesUiModel.observe(this, Observer{
 
-            currenciesAdapter.swap(it!!.currencies)
+            if(it!!.status == CurrenciesViewModel.CurrencyRatesUiModel.Status.ERROR) {
+                Toast.makeText(context, "Error loading...Try again...", Toast.LENGTH_SHORT).show()
 
-            if(it.baseCurrencyChanged){
+            }
+
+            currenciesAdapter.swap(it.currencies!!)
+
+            if(it.baseCurrencyChanged!!){
                 linaerLayoutManager.scrollToPositionWithOffset(0,0)
 
             }

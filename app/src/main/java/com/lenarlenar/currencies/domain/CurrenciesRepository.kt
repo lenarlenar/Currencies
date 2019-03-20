@@ -2,7 +2,8 @@ package com.lenarlenar.currencies.domain
 
 import com.lenarlenar.currencies.domain.models.RatesResponse
 import io.reactivex.Observable
+import io.reactivex.Single
 
 interface CurrenciesRepository {
-    fun getRates(base: String): Observable<RatesResponse>
+    fun getRates(base: String): Single<RatesResponse>
 }

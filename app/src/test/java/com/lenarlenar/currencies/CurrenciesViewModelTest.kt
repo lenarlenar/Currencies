@@ -10,6 +10,7 @@ import com.lenarlenar.currencies.helpers.RefreshCommander
 import com.lenarlenar.currencies.helpers.SchedulerProvider
 import com.lenarlenar.currencies.presentation.CurrenciesViewModel
 import io.reactivex.Observable
+import io.reactivex.Single
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -45,7 +46,7 @@ class CurrenciesViewModelTest{
         this.currenciesViewModel = CurrenciesViewModel(currenciesRepository, schedulerProvider, refreshCommander, CurrencySettingsImpl())
 
         Mockito.`when`(currenciesRepository.getRates(anyString()))
-            .thenAnswer {Observable.just(ratesResponse)}
+            .thenAnswer { Single.just(ratesResponse)}
     }
 
     @Test
@@ -69,7 +70,6 @@ class CurrenciesViewModelTest{
         val baseRateCode = currenciesViewModel.currentBaseCurrency.value!!.code
 
         val baseRateFromCurrenciesStateModel = currenciesViewModel.currencyRatesUiModel.value!!.currencies.firstOrNull{ it.code == baseRateCode}
-
         Assert.assertNotNull(baseRateFromCurrenciesStateModel)
     }
 
@@ -87,9 +87,9 @@ class CurrenciesViewModelTest{
         val newBaseCurrency = Currency("CO2", 4.0)
         currenciesViewModel.currentBaseCurrency.onNext(newBaseCurrency)
 
-        val baseRateFromCurrenciesStateModel = this.currenciesViewModel.currencyRatesUiModel.value!!.currencies.firstOrNull{ it.code == anotherCurrencyCode}
+        val baseRateFromCurrenciesStateModel = this.currenciesViewModel.currencyRatesUiModel.value!!.currencies.first{ it.code == anotherCurrencyCode}
+        Assert.assertTrue((newBaseCurrency.rate * anotherCurrencies.getValue(anotherCurrencyCode)).equals(baseRateFromCurrenciesStateModel.rate))
 
-        Assert.assertTrue((newBaseCurrency.rate * anotherCurrencies[anotherCurrencyCode]!!).equals(baseRateFromCurrenciesStateModel!!.rate))
     }
 
 }

@@ -8,7 +8,10 @@ import com.lenarlenar.currencies.domain.CurrenciesRepository
 import com.lenarlenar.currencies.domain.models.Currency
 import com.lenarlenar.currencies.helpers.RefreshCommander
 import com.lenarlenar.currencies.helpers.SchedulerProvider
+import io.reactivex.MaybeObserver
 import io.reactivex.Observable
+import io.reactivex.Observer
+import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.BehaviorSubject
 import javax.inject.Inject
@@ -33,8 +36,8 @@ class CurrenciesViewModel @Inject constructor(private val currenciesRepository: 
         currencyRatesUiModelDisposer = getCurrencyRatesUiModel()
                                     .observeOn(schedulerProvider.ui())
                                     .subscribe{
-                                            _currencyRatesUiModel.value = it
-                                        }
+                                         _currencyRatesUiModel.value = it
+                                    }
     }
 
     fun onStop(){
@@ -45,32 +48,39 @@ class CurrenciesViewModel @Inject constructor(private val currenciesRepository: 
                                 = Observable.merge(refreshCommander.`do`().map{ false }, currentBaseCurrency.map{ true })
                                     .flatMap {
                                             baseCurrencyChanged ->
-                                        createCurrencyRatesUiModel(baseCurrencyChanged)
+                                                createCurrencyRatesUiModel(baseCurrencyChanged).toObservable()
                                     }
 
+
     private fun createCurrencyRatesUiModel(baseCurrencyChanged: Boolean)
-                                = getRatesWithBase().map {
-                                                        CurrencyRatesUiModel(baseCurrencyChanged, it)
-                                                    }
+                                = getRatesWithBase()
+                                    .map {
+                                        CurrencyRatesUiModel(CurrencyRatesUiModel.Status.SUCCESS, baseCurrencyChanged, it)
+                                    }
+                                    .onErrorResumeNext { Single.just(CurrencyRatesUiModel(CurrencyRatesUiModel.Status.ERROR, false, listOf(currentBaseCurrency.value!!)))}
 
     private fun getRatesWithBase() = currenciesRepository.getRates(currentBaseCurrency.value!!.code)
                                         .map { currencyRates ->
 
-                                            val currencyRatesWithBase = mutableListOf<Currency>(currentBaseCurrency.value!!)
+                                                val currencyRatesWithBase = mutableListOf<Currency>(currentBaseCurrency.value!!)
 
-                                            currencyRates.rates.forEach {
-                                                                        currencyRatesWithBase.add(
-                                                                            Currency(
-                                                                                it.key
-                                                                                , it.value * currentBaseCurrency.value!!.rate
-                                                                                , currencySettings.getNameByCode(it.key)
-                                                                                , currencySettings.getFlagPathByCode(it.key)
+                                                currencyRates.rates.forEach {
+                                                                            currencyRatesWithBase.add(
+                                                                                Currency(
+                                                                                    it.key
+                                                                                    , it.value * currentBaseCurrency.value!!.rate
+                                                                                    , currencySettings.getNameByCode(it.key)
+                                                                                    , currencySettings.getFlagPathByCode(it.key)
+                                                                                )
                                                                             )
-                                                                        )
-                                            }
+                                                }
 
-                                            currencyRatesWithBase
+                                                currencyRatesWithBase.toList()
                                         }
 
-    data class CurrencyRatesUiModel(val baseCurrencyChanged: Boolean, val currencies: List<Currency>)
+    data class CurrencyRatesUiModel(val status: Status, val baseCurrencyChanged: Boolean, val currencies: List<Currency>){
+        enum class Status {
+            SUCCESS, ERROR
+        }
+    }
 }
